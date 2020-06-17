@@ -1,0 +1,62 @@
+
+
+CREATE
+  (i1:INSTRUMENT  { id: "1", name: "Piano", year: 1800 , price :  51200 }),
+  (i2:INSTRUMENT  { id: "2", name: "Guitar", year: 1660 , price : 7500 }),
+  (i3:INSTRUMENT  { id: "3", name: "Drum kit", year: 1923 , price :  12000  }),
+  (i4:INSTRUMENT  { id: "4", name: "Bass", year: 1920 , price :  3599  }),
+  (i5:INSTRUMENT  { id: "5", name: "Cello", year: 1800 , price :  23155  }),
+  (t1:MUSICALTYPE { id: "1", type: "Metal", musician: "Iron Maiden" }),
+  (t2:MUSICALTYPE { id: "2", type: "Reggae", musician: "Bob Marley" }),
+  (t3:MUSICALTYPE { id: "3", type: "Classical", musician: "Mozart" }),
+  (t4:MUSICALTYPE { id: "4", type: "Pop", musician: "Madona" }),
+  (t5:MUSICALTYPE { id: "5", type: "Rock", musician: "Led Zeppelin" }),
+  (t6:MUSICALTYPE { id: "5", type: "Indie", musician: " The Smiths" }),
+  (i1)-[u1:USEDWITH ]->(t3),
+  (i1)-[u2:USEDWITH ]->(t4),
+  (i2)-[u3:USEDWITH ]->(t1),
+  (i2)-[u4:USEDWITH ]->(t4),
+  (i2)-[u5:USEDWITH ]->(t5),
+  (i3)-[u6:USEDWITH ]->(t1),
+  (i3)-[u7:USEDWITH ]->(t2),
+  (i3)-[u8:USEDWITH ]->(t4),
+  (i3)-[u9:USEDWITH ]->(t5),
+  (i5)-[u10:USEDWITH ]->(t5),
+  (i3)-[u11:USEDWITH ]->(t3),
+  (i1)-[d1:DUETS]->(i5),
+  (i2)-[d2:DUETS]->(i3),
+  (i2)-[d3:DUETS]->(i4),
+  (i3)-[d4:DUETS]->(i4);
+  
+
+    //------------- show the musican of the Reggae musical Type ----------------
+	MATCH (t:MUSICALTYPE {type: "Reggae" })
+	RETURN t.type as MusicType, t.musician as Singer; 
+	
+	
+	//-------------get all instruments that costs less than 9999 ----------------
+	MATCH (i:INSTRUMENT )
+	WHERE i.price < 9999
+	RETURN i.name, i.year , i.price
+	ORDER BY i.price ASC, i.year DESC;
+	 
+	 
+	 //--- the relationships between the music type and wich instrument they are using --------
+	 //--- OPTION--- showing also the Indie music that don't have any assigened instruments in mydatabase ---
+	 MATCH ( t:MUSICALTYPE )
+     OPTIONAL MATCH (i:INSTRUMENT )-[:USEDWITH ]->( t:MUSICALTYPE )
+     RETURN  t.type , i.name ;
+	 
+	 
+     //------------- showing instruments that cost more than the whole average ----------------
+	 MATCH (i:INSTRUMENT)
+	 WITH AVG(i.price) AS average
+     MATCH (ii:INSTRUMENT)
+     WHERE ii.price > average
+	 RETURN ii.name, ii.year, ii.price, average;
+	  
+	  
+	 //------------------ show all musical combination DUETS, that can be done between two instruments  
+	 MATCH(i:INSTRUMENT)-[:DUETS]-> ( ii:INSTRUMENT )
+     RETURN i.name as duet1, ii.name as duet2;
+	
